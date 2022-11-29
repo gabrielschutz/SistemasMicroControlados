@@ -1,13 +1,16 @@
-from tkinter import *
-from tkinter import filedialog
+import tkinter
+import tkinter.messagebox
 import serial
 import time
+import customtkinter
+from tkinter import *
+from tkinter import filedialog
 
 port_opened=False
 
 def set_port():
     global port_opened,arduino
-    com_port= port_input.get()
+    com_port= entradaPorta.get()
     arduino=serial.Serial('COM4',9600)
     port_opened=True
     print ("PORTA SETADA PARA: "+com_port)
@@ -21,7 +24,7 @@ def send_positions(position):
 saved_positions = []
 
 def save_positions():
-    saved_positions.append([servo1_slider.get(), servo2_slider.get(), servo3_slider.get()]);
+    saved_positions.append([int(servo1_slider.get()), int(servo2_slider.get()), int(servo3_slider.get())]);
     print("Posições Salvas: "+str(saved_positions))
 
 def play_positions():
@@ -41,76 +44,58 @@ def clear_last_positions():
     print("Removido: "+str(removed))
     print("Posições Salvas: "+str(saved_positions))
 
-def open_file():
-    global saved_positions
-    filename = filedialog.askopenfilename(initialdir = "/", title = "Select a File", filetypes = (("Text files","*.txt*"),("all files","*.*")))
-    file = open(filename, "r")
-    data=file.read()
-    saved_positions=eval(data)
-    file.close()
-    print("Aberto: "+filename)
+customtkinter.set_appearance_mode("dark")  # Modes: "System" (standard), "Dark", "Light"
+customtkinter.set_default_color_theme("green")  # Themes: "blue" (standard), "green", "dark-blue"
 
-def save_file():
-    save_file = filedialog.asksaveasfile(mode='w', defaultextension=".txt")
-    save_file.write(str(saved_positions))
-    save_file.close()
-    print("Arquivo Gravado")
-
-window = Tk()
-window.title("Controle de Servos 1.0")
-window.minsize(380,300)
-window.grid()
-
-port_label=Label(window,text="Porta Arduino:");
-port_label.place(x=120,y=10);
-port_input=Entry(window)
-port_input.place(x=120,y=35)
-port_button=Button(window, text="Enter", command=set_port)
-port_button.place(x=250,y=32)
-
-servo1_slider = Scale(window, from_=180, to=0)
-servo1_slider.place(x=70, y=100)
-servo1_label=Label(window,text="Motor 1")
-servo1_label.place(x=70, y=80)
-
-servo2_slider = Scale(window, from_=180, to=0)
-servo2_slider.place(x=140, y=100)
-servo2_label=Label(window,text="Motor 2")
-servo2_label.place(x=140, y=80)
-
-servo3_slider = Scale(window, from_=180, to=0)
-servo3_slider.place(x=210, y=100)
-servo3_label=Label(window,text="Motor 3")
-servo3_label.place(x=210, y=80)
+JanelaControl = customtkinter.CTk()
+JanelaControl.geometry("500x680")
+JanelaControl.title("Controle de Servos V2.0")
 
 
-save_button=Button(window, text="Salvar Posições", command=save_positions)
-save_button.place(x=10,y=220)
+margem = customtkinter.CTkFrame(master=JanelaControl)
+margem.pack(pady=20, padx=60, fill="both", expand=True)
 
-clear_button=Button(window, text="Limpar ultima posição", command=clear_last_positions)
-clear_button.place(x=120,y=220)
+TituloPrincial = customtkinter.CTkLabel(master=margem,text="Controle Servos V2.0" ,justify=tkinter.LEFT,text_font=("C059",24))
+TituloPrincial.pack(pady=12, padx=10)
 
-clear_button=Button(window, text="Limpar todas Posições", command=clear_all_positions)
-clear_button.place(x=120,y=255)
+TextoPorta = customtkinter.CTkLabel(master=margem,text="Porta Arduino" ,justify=tkinter.LEFT)
+TextoPorta.pack(pady=1, padx=10)
 
-play_button=Button(window, text="Rodar Posições", command=play_positions, height=3)
-play_button.place(x=270,y=220)
+entradaPorta = customtkinter.CTkEntry(master=margem,placeholder_text="Ex: 'COM4'")
+entradaPorta.pack(pady=12,padx=10)
 
-menubar = Menu(window)
-filemenu = Menu(menubar, tearoff=0)
-filemenu.add_command(label="Abrir", command=open_file)
-filemenu.add_command(label="Salvar", command=save_file)
-menubar.add_cascade(label="Arquivo", menu=filemenu)
+BotaoArduinoSet = customtkinter.CTkButton(master=margem,text="Confirmar" ,command=set_port)
+BotaoArduinoSet.pack(pady=12, padx=10)
 
-editmenu = Menu(menubar, tearoff=0)
-editmenu.add_command(label="Limpar ultima Posição", command=clear_last_positions)
-editmenu.add_command(label="Limpar todas Posições", command=clear_all_positions)
-menubar.add_cascade(label="Editar", menu=editmenu)
+TextoSlider1 = customtkinter.CTkLabel(master=margem,text="Servo 1" ,justify=tkinter.LEFT)
+TextoSlider1.pack(pady=1, padx=10)
+
+servo1_slider = customtkinter.CTkSlider(master=margem,from_=0, to=180, variable=customtkinter.IntVar())
+servo1_slider.pack(pady=12, padx=10)
+
+TextoSlider2 = customtkinter.CTkLabel(master=margem,text="Servo 2" ,justify=tkinter.LEFT)
+TextoSlider2.pack(pady=1, padx=10)
+
+servo2_slider = customtkinter.CTkSlider(master=margem,from_=0, to=180,variable=tkinter.IntVar())
+servo2_slider.pack(pady=12, padx=10)
+
+TextoSlider3 = customtkinter.CTkLabel(master=margem,text="Servo 2" ,justify=tkinter.LEFT)
+TextoSlider3.pack(pady=1, padx=10)
+
+servo3_slider = customtkinter.CTkSlider(master=margem,from_=0, to=180,variable=tkinter.IntVar())
+servo3_slider.pack(pady=12, padx=10)
+
+BotaoSave = customtkinter.CTkButton(master=margem,text="Salvar Posiçoẽs" ,command=save_positions)
+BotaoSave.pack(pady=12, padx=10)
+
+BotaoLimpar = customtkinter.CTkButton(master=margem,text="Limpar Posiçoẽs" ,command=clear_all_positions)
+BotaoLimpar.pack(pady=12, padx=10)
+
+BotaoLimparultima = customtkinter.CTkButton(master=margem,text="Limpar Ultima Posição" ,command=clear_last_positions)
+BotaoLimparultima.pack(pady=12, padx=10)
+
+BotaoRodar = customtkinter.CTkButton(master=margem,text="Rodar Posiçoẽs" ,command=play_positions)
+BotaoRodar.pack(pady=12, padx=10)
 
 
-window.config(menu=menubar)
-
-while True:
-    window.update()
-    if(port_opened):
-        send_positions([servo1_slider.get(), servo2_slider.get(), servo3_slider.get()])
+JanelaControl.mainloop()
